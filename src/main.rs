@@ -1,6 +1,8 @@
 mod app;
 use app::App;
 
+mod parsing;
+
 use egui;
 use std::collections::HashMap;
 

@@ -2,6 +2,8 @@ use eframe::{egui, epi};
 use egui::widgets;
 use egui::TextStyle;
 
+use super::parsing::Lexer;
+
 pub struct App {
     display: String,
     answer: usize
@@ -128,7 +130,8 @@ impl epi::App for App {
                 let calculate = ui.add_sized(egui::Vec2 { x: 89.0, y: 40.0 }, button);
                 if calculate.clicked() {
                     // TODO: Parse display string.
-                    parse_calculation(display);
+                    let lexer = Lexer::new(display);
+                    lexer.tokenize();
                     display.clear();
                 }
             });
