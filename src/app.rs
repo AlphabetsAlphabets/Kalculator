@@ -18,20 +18,6 @@ impl Default for App {
     }
 }
 
-// TODO: Reading list
-// https://createlang.rs/
-// https://fenga.medium.com/how-to-build-a-calculator-bf558e6bd8eb
-// https://www.twilio.com/blog/abstract-syntax-trees
-fn parse_calculation(s: &str) -> String {
-    let operators = "+-÷×";
-    for op in operators.chars() {
-       if s.contains(op) {
-           s.split(op);
-       }
-    }
-    String::from("Hello")
-}
-
 fn button(ui: &mut egui::Ui, text: &str) -> egui::Response {
     let button = egui::Button::new(text);
     let button = ui.add_sized(egui::Vec2 { x: 40.0, y: 40.0 }, button);
@@ -42,6 +28,7 @@ impl epi::App for App {
     fn name(&self) -> &str {
         "Kal"
     }
+
 
     // TODO: Add a vertical spacer to spread the buttons out.
     // Also look at button_padding
@@ -131,7 +118,10 @@ impl epi::App for App {
                 if calculate.clicked() {
                     // TODO: Parse display string.
                     let lexer = Lexer::new(display);
-                    lexer.tokenize();
+                    let tokens = lexer.tokenize();
+                    for token in tokens {
+                        println!("{:?}", token);
+                    }
                     display.clear();
                 }
             });

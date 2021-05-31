@@ -5,6 +5,7 @@ pub enum TokenType {
     Minus,
     Multiply,
     Divide,
+    Percent,
     Eof,
     // LPAREN,
     // RPAREN,
@@ -40,25 +41,31 @@ impl Lexer {
     }
 
     // TODO: Get tokenizer working.
+    // https://createlang.rs/
+    // https://fenga.medium.com/how-to-build-a-calculator-bf558e6bd8eb
+    // https://www.twilio.com/blog/abstract-syntax-trees
     pub fn tokenize(self) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
 
-        let x = self.input.chars().map(|ch| {
+        // Before it was with a map(), but it needs to be used
+        // This is just easier with a for loop.
+        for ch in self.input.chars() {
             match ch {
-                '+' => return tokens.push(Token::new(TokenType::Plus, '+')),
-                '-' => return tokens.push(Token::new(TokenType::Minus, '-')),
-                '/' => return tokens.push(Token::new(TokenType::Divide, '/')),
-                '*' => return tokens.push(Token::new(TokenType::Multiply, '*')),
+                '+' => tokens.push(Token::new(TokenType::Plus, '+')),
+                '-' => tokens.push(Token::new(TokenType::Minus, '-')),
+                '/' => tokens.push(Token::new(TokenType::Divide, '/')),
+                '*' => tokens.push(Token::new(TokenType::Multiply, '*')),
+                '%' => tokens.push(Token::new(TokenType::Percent, '%')),
                 ' ' => {},
                 _ => {
                     if !ch.is_numeric() {
-                        return tokens.push(Token::new(TokenType::Eof, 'e'))
+                        tokens.push(Token::new(TokenType::Eof, 'e'))
                     } else {
-                        return tokens.push(Token::new(TokenType::Int, ch))
+                        tokens.push(Token::new(TokenType::Int, ch))
                     }
                 }
             };
-        });
+        }
         tokens
     }
 }
