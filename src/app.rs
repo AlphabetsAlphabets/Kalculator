@@ -6,14 +6,14 @@ use super::parsing::Lexer;
 
 pub struct App {
     display: String,
-    answer: usize
+    answer: usize,
 }
 
 impl Default for App {
     fn default() -> Self {
         App {
             display: "".to_string(),
-            answer: 0
+            answer: 0,
         }
     }
 }
@@ -28,7 +28,6 @@ impl epi::App for App {
     fn name(&self) -> &str {
         "Kal"
     }
-
 
     // TODO: Add a vertical spacer to spread the buttons out.
     // Also look at button_padding
