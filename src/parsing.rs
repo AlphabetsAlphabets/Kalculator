@@ -97,7 +97,6 @@ impl Lexer {
     pub fn tokenize(self) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
 
-        // -2
         for (c, ch) in self.input.chars().enumerate() {
             let left = {
                 if c == 0 {

@@ -73,12 +73,12 @@ impl epi::App for App {
                     *display = format!("{}{}", display, "6".to_string());
                 }
 
-                if button(ui, "÷").clicked() {
-                    *display = format!("{}{}", display, "÷".to_string());
+                if button(ui, "/").clicked() {
+                    *display = format!("{}{}", display, "/".to_string());
                 }
 
-                if button(ui, "×").clicked() {
-                    *display = format!("{}{}", display, "×".to_string());
+                if button(ui, "*").clicked() {
+                    *display = format!("{}{}", display, "*".to_string());
                 }
             });
 
@@ -121,6 +121,7 @@ impl epi::App for App {
                     for token in tokens {
                         println!("{:?}", token);
                     }
+                    println!("---");
                     display.clear();
                 }
             });
