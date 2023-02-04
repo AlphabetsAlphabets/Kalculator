@@ -75,6 +75,7 @@ void match(const char& c) {
 }
 
 int main() {
+    // https://www.youtube.com/watch?v=jIxsH3E-Hjg
     std::string line = "3 * (1 - 2)";
     auto lexer = Lexer(line);
     lexer.print_tokens();
