@@ -1,6 +1,9 @@
-#include <iostream>
-#include <vector>
 #include <string>
+#include <array>
+#include <vector>
+#include <iterator>
+#include <iostream>
+#include <algorithm>
 
 const int PAREN = 6;
 const int POW = 5;
@@ -12,8 +15,9 @@ const int SUB = 1;
 class Lexer {
     private:
         std::vector<char> m_chars;
-        std::vector<int> m_operators;
-        std::vector<int> m_operands;
+        std::vector<char> m_postfix;
+        std::vector<char> m_operators;
+        std::vector<char> m_operands;
         std::string m_contents;
 
         void split_by_char() {
@@ -30,36 +34,24 @@ class Lexer {
             }
         }
 
-        void tokenize() {
+        void tokenize(const char target) {
             split_by_char();
             int size = std::size(m_chars);
-            for (int i = 0; i < size; i++) {
-                auto c = m_chars[i];
-                int level = 1;
-                if (c == '(' || c == ')') {
-                    level = PAREN;
-                } else if (c == '^') {
-                    level = POW;
-                } else if (c == '*') {
-                    level = MULTI;
-                } else if (c == '/') {
-                    level = DIVIDE;
-                } else if (c == '+') {
-                    level = ADD;
-                } else if (c == '-') {
-                    level = SUB;
-                } else {
-                    m_operands.push_back(c + '0');
-                }
-
-                m_operators.push_back(level);
+            // (1 + 2) * 3 = 1 2 3 + *
+            // 2 * 3 - 1 = 2 3 1 * -
+            // 3 * (1 - 2) = 3 1 2 - *
+            
+            if (target == '(') {
+                auto it = std::find(m_chars.begin(), m_chars.end(), target);
+                int index = std::distance(m_chars.begin(), it);
+                std::vector<char> remainder(m_chars.begin() + index, m_chars.end());
             }
         }
 
     public:
         Lexer(std::string content) {
             m_contents = content;
-            tokenize();
+            tokenize('(');
         }
 
         void print_tokens() {
@@ -83,7 +75,7 @@ void match(const char& c) {
 }
 
 int main() {
-    std::string line = "1 + 2 / 5 * 3";
+    std::string line = "3 * (1 - 2)";
     auto lexer = Lexer(line);
     lexer.print_tokens();
 }
