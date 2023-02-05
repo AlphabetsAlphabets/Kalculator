@@ -170,6 +170,6 @@ class Lexer {
 
 int main() {
     // https://www.youtube.com/watch?v=jIxsH3E-Hjg
-    std::string line = "1 + 2 * 3";
+    std::string line = "1 + 2 * 3"; // set a breakpoint here
     auto lexer = Lexer(line);
 }
