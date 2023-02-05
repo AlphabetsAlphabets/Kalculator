@@ -1,5 +1,5 @@
-#include <string>
 #include <array>
+#include <string>
 #include <vector>
 #include <iterator>
 #include <iostream>
@@ -12,12 +12,45 @@ const int DIVIDE = 3;
 const int ADD = 2;
 const int SUB = 1;
 
+class Token {
+    private:
+        void set_precedence(char c) {
+            switch (c) {
+                case '+':
+                    m_precedence = ADD;
+                    break;
+                case '-':
+                    m_precedence = SUB;
+                    break;
+                case '*':
+                    m_precedence = MULTI;
+                    break;
+                case '/':
+                    m_precedence = DIVIDE;
+                    break;
+            }
+        }
+
+    public:
+        char m_char;
+        int m_precedence;
+
+        Token(char c) {
+            m_char = c;
+            set_precedence(c);
+        }
+
+        bool has_greater_precedence(char target_op) {
+            return m_precedence > target_op;
+        }
+
+};
+
 class Lexer {
     private:
+        std::vector<Token> m_tokens;
         std::vector<char> m_chars;
-        std::vector<char> m_postfix;
-        std::vector<char> m_operators;
-        std::vector<char> m_operands;
+        std::vector<char>::iterator m_iter;
         std::string m_contents;
 
         void split_by_char() {
@@ -32,51 +65,115 @@ class Lexer {
 
                 m_chars.push_back(chars[i]);
             }
+
+            m_iter = m_chars.begin();
         }
 
-        void tokenize(const char target) {
-            split_by_char();
-            int size = std::size(m_chars);
-            // (1 + 2) * 3 = 1 2 3 + *
-            // 2 * 3 - 1 = 2 3 1 * -
-            // 3 * (1 - 2) = 3 1 2 - *
-            
-            if (target == '(') {
-                auto it = std::find(m_chars.begin(), m_chars.end(), target);
-                int index = std::distance(m_chars.begin(), it);
-                std::vector<char> remainder(m_chars.begin() + index, m_chars.end());
+
+        int parse_expression(char lhs, int precedence) {
+            // 1 + 2
+            // lhs = 1
+            // next token = +
+            // suc token = 2
+            // lhs operation suc token
+            // operation is based on next token
+            bool is_iter_finished = lookahead();
+            char next_token = *m_iter;
+            while (is_binary_op(next_token) && is_iter_finished) {
+                // NOTE: rhs can be '\0'
+                auto op = Token(next_token);
+                is_iter_finished = lookahead();
+                char rhs = *m_iter;
+                is_iter_finished = lookahead();
+
+                lhs = perform_operation(lhs, op.m_char, rhs);
+
+                char succeeding_token = *m_iter;
+                bool is_suceeding_token_op = is_binary_op(succeeding_token);
+
+                auto suceeding_op = Token(succeeding_token);
+                bool is_precedence_greater =  op.has_greater_precedence(suceeding_op.m_precedence);
+
+                while (is_suceeding_token_op && is_precedence_greater && is_iter_finished) {
+                    lookahead();
+                    if (suceeding_op.has_greater_precedence(*m_iter)) {
+                        parse_expression(rhs, suceeding_op.m_precedence + 1);
+                    } else {
+                        parse_expression(rhs, suceeding_op.m_precedence);
+                    }
+                }
+            }
+
+            return lhs;
+        }
+
+        int perform_operation(char lhs, char op, char rhs) {
+            int res;
+            switch (op) {
+                case '+':
+                    res= lhs + rhs;
+                    break;
+                case '-':
+                    res = lhs - rhs;
+                    break;
+                case '*':
+                    res =  lhs * rhs;
+                    break;
+                case '/':
+                    res =  lhs / rhs;
+                    break;
+            }
+
+            return res;
+        }
+
+        bool is_binary_op(char c) {
+            bool res = false;
+            switch (c) {
+                case '+':
+                    res = true;
+                    break;
+                case '-':
+                    res = true;
+                    break;
+                case '*':
+                    res = true;
+                    break;
+                case '/':
+                    res = true;
+                    break;
+            }
+
+            return res;
+        }
+
+
+        bool lookahead() {
+            if (*m_iter == *m_chars.end()) {
+                return true;
+            } else {
+                m_iter++;
+                return false;
             }
         }
 
     public:
         Lexer(std::string content) {
             m_contents = content;
-            tokenize('(');
+            eval();
         }
 
-        void print_tokens() {
-            int size = std::size(m_operators);
-            for (int i = 0; i < size; i++) {
-                std::cout << m_operators[i];
-            }
-
-            std::cout << std::endl;
-        }
-
-        void calc() {
-
+        void eval() {
+            split_by_char();
+            // 1 + 2 * 3
+            int res = parse_expression(*m_iter, 0);
+            std::cout << res << std::endl;
         }
 };
 
-void match(const char& c) {
-    if (c == DIVIDE) {
-    }
-
-}
 
 int main() {
     // https://www.youtube.com/watch?v=jIxsH3E-Hjg
-    std::string line = "3 * (1 - 2)";
+    std::string line = "1 + 2 * 3";
     auto lexer = Lexer(line);
-    lexer.print_tokens();
 }

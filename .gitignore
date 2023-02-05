@@ -1,5 +1,8 @@
+Makefile
+CMakeFiles/
+CMakeCache.txt
+
 compile_commands.json
 cmake_install.cmake
-CMakeCache.txt
-CMakeFiles/
-Makefile
+
+calc
