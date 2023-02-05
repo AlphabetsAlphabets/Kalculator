@@ -40,8 +40,9 @@ class Token {
             set_precedence(c);
         }
 
-        bool has_greater_precedence(char target_op) {
-            return m_precedence > target_op;
+        // This failed before as `target_op` was type `char` instead of `Token`.
+        bool has_greater_precedence(Token target_op) {
+            return m_precedence > target_op.m_precedence;
         }
 
 };
@@ -63,45 +64,39 @@ class Lexer {
                     continue;
                 }
 
-                m_chars.push_back(chars[i]);
+                m_chars.push_back((int) chars[i]);
             }
 
             m_iter = m_chars.begin();
         }
 
 
-        int parse_expression(char lhs, int precedence) {
-            // 1 + 2
-            // lhs = 1
-            // next token = +
-            // suc token = 2
-            // lhs operation suc token
-            // operation is based on next token
+        int parse_expression(int lhs, int precedence) {
+            // 1 + 2 * 3
+            // LHS = 1
             bool is_iter_finished = lookahead();
-            char next_token = *m_iter;
+            char next_token = *m_iter; // +
             while (is_binary_op(next_token) && is_iter_finished) {
-                // NOTE: rhs can be '\0'
-                auto op = Token(next_token);
+                auto op = Token(next_token); 
                 is_iter_finished = lookahead();
-                char rhs = *m_iter;
-                is_iter_finished = lookahead();
+                int rhs = (int) *m_iter; // 2
+                is_iter_finished = lookahead(); 
 
-                lhs = perform_operation(lhs, op.m_char, rhs);
-
-                char succeeding_token = *m_iter;
-                bool is_suceeding_token_op = is_binary_op(succeeding_token);
+                char succeeding_token = *m_iter; // *
+                bool is_suceeding_token_op = is_binary_op(succeeding_token); // * is an operator
 
                 auto suceeding_op = Token(succeeding_token);
-                bool is_precedence_greater =  op.has_greater_precedence(suceeding_op.m_precedence);
+                // Checks if + or * has more precedence.
+                // Should return false since * is more precedent
+                bool is_precedence_greater = op.has_greater_precedence(suceeding_op.m_precedence);
 
-                while (is_suceeding_token_op && is_precedence_greater && is_iter_finished) {
-                    lookahead();
-                    if (suceeding_op.has_greater_precedence(*m_iter)) {
-                        parse_expression(rhs, suceeding_op.m_precedence + 1);
-                    } else {
-                        parse_expression(rhs, suceeding_op.m_precedence);
-                    }
+                while (is_suceeding_token_op && !is_precedence_greater && is_iter_finished) {
+                    is_iter_finished = lookahead();
+                    int operand = (int) *m_iter; // 3
+                    rhs = parse_expression(rhs, op.m_precedence + 1);
                 }
+
+                lhs = perform_operation(lhs, op.m_char, rhs);
             }
 
             return lhs;
@@ -111,7 +106,7 @@ class Lexer {
             int res;
             switch (op) {
                 case '+':
-                    res= lhs + rhs;
+                    res = lhs + rhs;
                     break;
                 case '-':
                     res = lhs - rhs;
@@ -148,6 +143,7 @@ class Lexer {
         }
 
 
+        // Moves the iterator forward. Will return true if iterator is at its end.
         bool lookahead() {
             if (*m_iter == *m_chars.end()) {
                 return true;
