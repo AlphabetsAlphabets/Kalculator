@@ -76,7 +76,7 @@ class Lexer {
             // LHS = 1
             bool is_iter_finished = lookahead();
             char next_token = *m_iter; // +
-            while (is_binary_op(next_token) && is_iter_finished) {
+            while (is_binary_op(next_token) && !is_iter_finished) {
                 auto op = Token(next_token); 
                 is_iter_finished = lookahead();
                 int rhs = (int) *m_iter; // 2
