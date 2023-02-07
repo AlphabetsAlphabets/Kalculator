@@ -1,6 +1,6 @@
 {
   "configurations": {
-    "Launch": {
+    "run": {
       "adapter": "vscode-cpptools",
       "configuration": {
         "request": "launch",
