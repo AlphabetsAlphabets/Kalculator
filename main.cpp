@@ -64,7 +64,7 @@ class Lexer {
                     continue;
                 }
 
-                m_chars.push_back((int) chars[i]);
+                m_chars.push_back(chars[i]);
             }
 
             m_iter = m_chars.begin();
@@ -79,7 +79,7 @@ class Lexer {
             while (is_binary_op(next_token) && !is_iter_finished) {
                 auto op = Token(next_token); 
                 is_iter_finished = lookahead();
-                int rhs = (int) *m_iter; // 2
+                int rhs = *m_iter - '0'; // 2
                 is_iter_finished = lookahead(); 
 
                 char succeeding_token = *m_iter; // *
@@ -92,7 +92,7 @@ class Lexer {
 
                 while (is_suceeding_token_op && !is_precedence_greater && is_iter_finished) {
                     is_iter_finished = lookahead();
-                    int operand = (int) *m_iter; // 3
+                    int operand = *m_iter - '0'; // 3
                     rhs = parse_expression(rhs, op.m_precedence + 1);
                 }
 
@@ -162,8 +162,9 @@ class Lexer {
         void eval() {
             split_by_char();
             // 1 + 2 * 3
-            int res = parse_expression(*m_iter, 0);
-            std::cout << res << std::endl;
+	    int operand = *m_iter - '0';
+        int res = parse_expression(operand, 0);
+        std::cout << res << std::endl;
         }
 };
 
