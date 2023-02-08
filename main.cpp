@@ -89,12 +89,15 @@ class Lexer {
 
                 auto suceeding_op = Token(succeeding_token);
                 // Checks if + or * has more precedence.
-                // Should return false since * is more precedent
+                // Should return alse since * is more precedent
                 bool is_precedence_greater = op.compare_precedence(suceeding_op.m_precedence);
 
                 while (is_suceeding_token_op && !is_precedence_greater && !is_iter_finished) {
                     is_iter_finished = lookahead();
-		    if (is_iter_finished) break;
+                    lhs = perform_operation(lhs, op.m_char, rhs);
+
+                    if (is_iter_finished) break;
+
                     int operand = *m_iter - '0'; // 3
                     rhs = parse_expression(rhs, op.m_precedence + 1);
                 }
@@ -175,6 +178,6 @@ class Lexer {
 int main() {
     // Test
     // https://www.youtube.com/watch?v=jIxsH3E-Hjg
-    std::string line = "1 + 2 * 3"; // set a breakpoint here
+    std::string line = "1 + 4 * 3"; // set a breakpoint here
     auto lexer = Lexer(line);
 }
