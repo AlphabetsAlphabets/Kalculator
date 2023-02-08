@@ -35,13 +35,15 @@ class Token {
         char m_char;
         int m_precedence;
 
+	// `Token` will *always* be an operator. Simply pass in the ascii value of the character
+	// and it will be converted to the literal representation via a static cast.
         Token(char c) {
-            m_char = c;
+            m_char = static_cast<char>(c);
             set_precedence(c);
         }
 
-        // This failed before as `target_op` was type `char` instead of `Token`.
-        bool has_greater_precedence(Token target_op) {
+        // Returns true if `Token.m_precedence` is greater than `target_op.m_precedence`
+        bool compare_precedence(Token target_op) {
             return m_precedence > target_op.m_precedence;
         }
 
@@ -88,10 +90,11 @@ class Lexer {
                 auto suceeding_op = Token(succeeding_token);
                 // Checks if + or * has more precedence.
                 // Should return false since * is more precedent
-                bool is_precedence_greater = op.has_greater_precedence(suceeding_op.m_precedence);
+                bool is_precedence_greater = op.compare_precedence(suceeding_op.m_precedence);
 
-                while (is_suceeding_token_op && !is_precedence_greater && is_iter_finished) {
+                while (is_suceeding_token_op && !is_precedence_greater && !is_iter_finished) {
                     is_iter_finished = lookahead();
+		    if (is_iter_finished) break;
                     int operand = *m_iter - '0'; // 3
                     rhs = parse_expression(rhs, op.m_precedence + 1);
                 }
@@ -162,9 +165,9 @@ class Lexer {
         void eval() {
             split_by_char();
             // 1 + 2 * 3
-	    int operand = *m_iter - '0';
-        int res = parse_expression(operand, 0);
-        std::cout << res << std::endl;
+            int operand = *m_iter - '0';
+            int res = parse_expression(operand, 0);
+            std::cout << res << std::endl;
         }
 };
 
