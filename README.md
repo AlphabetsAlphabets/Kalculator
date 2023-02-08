@@ -1,2 +1,2 @@
 # Kalculator
-Terminal based calculator made in C++.
+A calculator made in C++ with operator precedence.
