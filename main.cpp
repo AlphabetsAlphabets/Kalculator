@@ -99,6 +99,7 @@ class Lexer {
                 }
 
                 lhs = perform_operation(lhs, op.m_char, rhs);
+                next_token = suceeding_op.m_char;
             }
 
             return lhs;
