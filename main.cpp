@@ -35,15 +35,15 @@ class Token {
         char m_char;
         int m_precedence;
 
-	// `Token` will *always* be an operator. Simply pass in the ascii value of the character
-	// and it will be converted to the literal representation via a static cast.
+        // `Token` will *always* be an operator. Simply pass in the ascii value of the character
+        // and it will be converted to the literal representation via a static cast.
         Token(char c) {
             m_char = static_cast<char>(c);
             set_precedence(c);
         }
 
         // Returns true if `Token.m_precedence` is greater than `target_op.m_precedence`
-        bool compare_precedence(Token target_op) {
+        bool compare_precedence(Token& target_op) {
             return m_precedence > target_op.m_precedence;
         }
 
@@ -74,23 +74,19 @@ class Lexer {
 
 
         int parse_expression(int lhs, int precedence) {
-            // 1 + 2 * 3
-            // LHS = 1
             bool is_iter_finished = lookahead();
-            char next_token = *m_iter; // +
+            char next_token = *m_iter; 
             while (is_binary_op(next_token) && !is_iter_finished) {
                 auto op = Token(next_token); 
                 is_iter_finished = lookahead();
-                int rhs = *m_iter - '0'; // 2
+                int rhs = *m_iter - '0';
                 is_iter_finished = lookahead(); 
 
-                char succeeding_token = *m_iter; // *
-                bool is_suceeding_token_op = is_binary_op(succeeding_token); // * is an operator
+                char succeeding_token = *m_iter;
+                bool is_suceeding_token_op = is_binary_op(succeeding_token);
 
                 auto suceeding_op = Token(succeeding_token);
-                // Checks if + or * has more precedence.
-                // Should return alse since * is more precedent
-                bool is_precedence_greater = op.compare_precedence(suceeding_op.m_precedence);
+                bool is_precedence_greater = op.compare_precedence(suceeding_op);
 
                 while (is_suceeding_token_op && !is_precedence_greater && !is_iter_finished) {
                     is_iter_finished = lookahead();
@@ -98,7 +94,7 @@ class Lexer {
 
                     if (is_iter_finished) break;
 
-                    int operand = *m_iter - '0'; // 3
+                    int operand = *m_iter - '0';
                     rhs = parse_expression(rhs, op.m_precedence + 1);
                 }
 
@@ -176,6 +172,7 @@ class Lexer {
 
 
 int main() {
-    std::string line = "3 + 3 / 3";
+    std::string line = "3 * 2 + 1";
+    // std::string line = "1 + 2 * 3";
     auto lexer = Lexer(line);
 }
