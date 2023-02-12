@@ -3,12 +3,14 @@
 #include <string>
 #include <vector>
 
+// Normal precedence rules have MULTI and DIVIDE have different precedence.
+// But this is just a simple implementation for whole numbers only.
+
 const int MULTI = 2;
 const int DIVIDE = 2;
 const int ADD = 1;
 const int SUB = 1;
 const int NUM = 0;
-const int NAN = -1;
 
 struct Operator {
     char m_op;
@@ -113,4 +115,7 @@ class Lexer {
         }
 };
 
-int main() { std::string expr = "2 + 3 * 4 + 5"; }
+int main() { 
+    std::string expr = "2 + 3 * 4 + 5"; 
+    auto lexer = Lexer(expr);
+}
