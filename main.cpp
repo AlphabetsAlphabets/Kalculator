@@ -30,20 +30,23 @@ class Token {
                     m_precedence = DIVIDE;
                     break;
                 default:
-                    m_precedence = NUM;
-                    m_operand = c - '0';
-
                     if (!std::isdigit(c)) {
                         m_precedence = NAN;
+                    } else {
+                        m_precedence = NUM;
+                        m_operand = c - '0';
                     }
             }
         }
 
     public:
         char m_op;
-        int m_operand;
-        int m_precedence;
         bool m_is_op;
+        int m_precedence;
+
+        int m_operand;
+
+        Token() {}
 
         Token(char c, bool is_op) {
             m_is_op = is_op;
@@ -51,16 +54,16 @@ class Token {
             set_precedence(c);
         }
 
+        Token(int operand) {
+            m_is_op = false;
+            m_precedence = NUM;
+            m_operand = operand;
+        }
+
         // Returns true if `m_precedence` is greater than or equal 
         // `target_op.m_precedence`
         bool compare_precedence(Token& target_op) {
             return m_precedence > target_op.m_precedence;
-        }
-        
-        // Returns true if `m_precedence` is greater than or equal 
-        // `precedence`
-        bool compare_precedence(int precedence) {
-            return m_precedence > precedence;
         }
 };
 
@@ -101,11 +104,18 @@ class Lexer {
                 bool greater_precedence_than_op = succeeding_op.compare_precedence(op);
 
                 while (succeeding_op.m_is_op && greater_precedence_than_op && !m_is_iter_finished) {
+                    lookahead();
+
+                    lhs = perform_operation(lhs, op, rhs);
+
+                    if (m_is_iter_finished) break;
+
                     rhs = parse_expression(rhs);
-                    lookahead(); // The return isn't used
+                    // lookahead(); // The return isn't used, so the 3rd op is completely ignored
                 }
 
                 lhs = perform_operation(lhs, op, rhs);
+                op = succeeding_op;
             }
 
             return lhs;
@@ -131,7 +141,8 @@ class Lexer {
                     break;
             }
 
-            auto resultant_token = Token(result - '0', false);
+            // Result is calculated properly but token is NAN.
+            auto resultant_token = Token(result);
             return resultant_token;
         }
 
@@ -157,18 +168,24 @@ class Lexer {
 
         // Moves the iterator forward. Will return true if iterator is at its end.
         Token lookahead() {
-            char next;
-            if (*m_iter == *m_chars.begin()) {
-                next = *m_iter;
-                m_iter++;
-            } else {
-                next = *m_iter++;
-            }
+            // Should only trigger once which is at the start 
+            if (m_iter == m_chars.begin()) {
+                auto token = Token(*m_iter++, false);
+                return token;
+            } 
+
+            char next = *m_iter++;
+            Token token;
 
             bool is_op = is_binary_op(next);
-            auto token = Token(next, is_op);
 
-            m_is_iter_finished =  *m_iter == *m_chars.end();
+            if (is_op) {
+                token = Token(next, is_op);
+            } else {
+                token = Token(next);
+            }
+
+            m_is_iter_finished = m_iter == m_chars.end();
 
             return token;
         }
@@ -183,7 +200,8 @@ class Lexer {
             split_by_char();
             // This assumes that the first character is always going to be a positive number.
             Token lhs = lookahead();
-            parse_expression(lhs);
+            lhs = parse_expression(lhs);
+            std::cout << lhs.m_operand << std::endl;
         }
 };
 
