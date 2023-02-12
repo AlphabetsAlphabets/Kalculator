@@ -4,13 +4,14 @@
 #include <iterator>
 #include <iostream>
 #include <algorithm>
+#include <cctype>
 
-const int PAREN = 6;
-const int POW = 5;
-const int MULTI = 4;
-const int DIVIDE = 3;
-const int ADD = 2;
+const int MULTI = 2;
+const int DIVIDE = 2;
+const int ADD = 1;
 const int SUB = 1;
+const int NUM = 0;
+const int NAN = -1;
 
 class Token {
     private:
@@ -28,25 +29,39 @@ class Token {
                 case '/':
                     m_precedence = DIVIDE;
                     break;
+                default:
+                    m_precedence = NUM;
+                    m_operand = c - '0';
+
+                    if (!std::isdigit(c)) {
+                        m_precedence = NAN;
+                    }
             }
         }
 
     public:
-        char m_char;
+        char m_op;
+        int m_operand;
         int m_precedence;
+        bool m_is_op;
 
-        // `Token` will *always* be an operator. Simply pass in the ascii value of the character
-        // and it will be converted to the literal representation via a static cast.
-        Token(char c) {
-            m_char = static_cast<char>(c);
+        Token(char c, bool is_op) {
+            m_is_op = is_op;
+            m_op = c;
             set_precedence(c);
         }
 
-        // Returns true if `Token.m_precedence` is greater than `target_op.m_precedence`
+        // Returns true if `m_precedence` is greater than or equal 
+        // `target_op.m_precedence`
         bool compare_precedence(Token& target_op) {
             return m_precedence > target_op.m_precedence;
         }
-
+        
+        // Returns true if `m_precedence` is greater than or equal 
+        // `precedence`
+        bool compare_precedence(int precedence) {
+            return m_precedence > precedence;
+        }
 };
 
 class Lexer {
@@ -55,14 +70,16 @@ class Lexer {
         std::vector<char> m_chars;
         std::vector<char>::iterator m_iter;
         std::string m_contents;
+        bool m_is_iter_finished;
 
+        // Gets all the characters from the string, and remove any whitespace
         void split_by_char() {
             int length = m_contents.length();
             const char* chars = m_contents.c_str();
 
             for (int i = 0; i < length; i++) {
                 char c = chars[i];
-                if (c == ' ') {
+                if (c == ' ' || c == '\0') {
                     continue;
                 }
 
@@ -73,56 +90,49 @@ class Lexer {
         }
 
 
-        int parse_expression(int lhs, int precedence) {
-            bool is_iter_finished = lookahead();
-            char next_token = *m_iter; 
-            while (is_binary_op(next_token) && !is_iter_finished) {
-                auto op = Token(next_token); 
-                is_iter_finished = lookahead();
-                int rhs = *m_iter - '0';
-                is_iter_finished = lookahead(); 
+        Token parse_expression(Token lhs) {
+            Token op = lookahead();
+            bool greater_eq_precedence = op.compare_precedence(lhs);
 
-                char succeeding_token = *m_iter;
-                bool is_suceeding_token_op = is_binary_op(succeeding_token);
+            while (op.m_is_op && greater_eq_precedence && !m_is_iter_finished) {
+                Token rhs = lookahead();
 
-                auto suceeding_op = Token(succeeding_token);
-                bool is_precedence_greater = op.compare_precedence(suceeding_op);
+                Token succeeding_op = lookahead();
+                bool greater_precedence_than_op = succeeding_op.compare_precedence(op);
 
-                while (is_suceeding_token_op && !is_precedence_greater && !is_iter_finished) {
-                    is_iter_finished = lookahead();
-                    lhs = perform_operation(lhs, op.m_char, rhs);
-
-                    if (is_iter_finished) break;
-
-                    int operand = *m_iter - '0';
-                    rhs = parse_expression(rhs, op.m_precedence + 1);
+                while (succeeding_op.m_is_op && greater_precedence_than_op && !m_is_iter_finished) {
+                    rhs = parse_expression(rhs);
+                    lookahead(); // The return isn't used
                 }
 
-                lhs = perform_operation(lhs, op.m_char, rhs);
-                next_token = suceeding_op.m_char;
+                lhs = perform_operation(lhs, op, rhs);
             }
 
             return lhs;
         }
 
-        int perform_operation(char lhs, char op, char rhs) {
-            int res;
-            switch (op) {
+        Token perform_operation(Token lhs, Token op, Token rhs) {
+            int result;
+            int v1 = lhs.m_operand;
+            int v2 = rhs.m_operand;
+
+            switch (op.m_op) {
                 case '+':
-                    res = lhs + rhs;
+                    result = v1 + v2;
                     break;
                 case '-':
-                    res = lhs - rhs;
+                    result = v1 - v2;
                     break;
                 case '*':
-                    res =  lhs * rhs;
+                    result =  v1 * v2;
                     break;
                 case '/':
-                    res =  lhs / rhs;
+                    result =  v1 / v2;
                     break;
             }
 
-            return res;
+            auto resultant_token = Token(result - '0', false);
+            return resultant_token;
         }
 
         bool is_binary_op(char c) {
@@ -145,15 +155,22 @@ class Lexer {
             return res;
         }
 
-
         // Moves the iterator forward. Will return true if iterator is at its end.
-        bool lookahead() {
-            if (*m_iter == *m_chars.end()) {
-                return true;
-            } else {
+        Token lookahead() {
+            char next;
+            if (*m_iter == *m_chars.begin()) {
+                next = *m_iter;
                 m_iter++;
-                return false;
+            } else {
+                next = *m_iter++;
             }
+
+            bool is_op = is_binary_op(next);
+            auto token = Token(next, is_op);
+
+            m_is_iter_finished =  *m_iter == *m_chars.end();
+
+            return token;
         }
 
     public:
@@ -164,16 +181,17 @@ class Lexer {
 
         void eval() {
             split_by_char();
-            // 1 + 2 * 3
-            int operand = *m_iter - '0';
-            int res = parse_expression(operand, 0);
-            std::cout << res << std::endl;
+            // This assumes that the first character is always going to be a positive number.
+            Token lhs = lookahead();
+            parse_expression(lhs);
         }
 };
 
 
 int main() {
-    std::string line = "3 * 2 + 1";
-    // std::string line = "1 + 2 * 3";
+    /* std::string line; */
+    /* std::cout << "Expression: "; */
+    /* getline(std::cin, line); */
+    std::string line = "1 + 2 * 3";
     auto lexer = Lexer(line);
 }
