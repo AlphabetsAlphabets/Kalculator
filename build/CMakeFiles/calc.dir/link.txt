@@ -1,0 +1,1 @@
+/usr/bin/c++  -g CMakeFiles/calc.dir/src/main.cpp.o CMakeFiles/calc.dir/src/token.cpp.o CMakeFiles/calc.dir/src/lexer.cpp.o -o /home/yjh/Documents/Kalculator/calc 
