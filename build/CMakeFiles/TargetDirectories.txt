@@ -1,3 +1,0 @@
-/home/yjh/Documents/Kalculator/build/CMakeFiles/calc.dir
-/home/yjh/Documents/Kalculator/build/CMakeFiles/edit_cache.dir
-/home/yjh/Documents/Kalculator/build/CMakeFiles/rebuild_cache.dir
