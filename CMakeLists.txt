@@ -9,4 +9,4 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project(calc)
-add_executable(calc main.cpp)
+add_executable(calc main.cpp tokens.cpp lexer.cpp tokens.h lexer.h)
