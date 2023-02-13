@@ -1,6 +1,3 @@
-builds/CMakeFiles/
-builds/Makefile
-builds/CMakeCache.txt
-builds/cmake_install.cmake
+builds/
 
 calc
