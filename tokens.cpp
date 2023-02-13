@@ -20,8 +20,10 @@ struct Operand {
 };
 
 // A token can be two things.
-// 1. An operator
-// 2. An operand
+// 1. An `Operator`.
+// 2. An `Operand`.
+//
+// One or the other but not both.
 class Token {
     private:
         Operator m_operator;
@@ -49,7 +51,9 @@ class Token {
         }
 
     public:
-        // Default constructor. Fallback to default member initialisation.
+        // Made for compatability. Won't actually be used for processing. 
+	// Only used to initialize an empty token that is to be reseated.
+	// Or for any other similar process.
         Token() {}
 
         // Used only to create an `Operator`
