@@ -18,10 +18,5 @@ set(cpp_files
 	"${src_dir}/lexer.cpp"
 )
 
-set(header_files
-	"${src_dir}/token.h"
-	"${src_dir}/lexer.h"
-)
-
 add_executable(calc ${cpp_files} ${header_files})
-target_include_directories(calc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(calc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
