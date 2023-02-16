@@ -3,13 +3,10 @@
 
 struct Operator {
     char m_op;
-    int m_precedence;
 };
 
 struct Operand {
     int m_value;
-    // This is only for compatability, will always be 0.
-    int m_precedence;
 };
 
 // A token can be two things.
@@ -25,6 +22,7 @@ class Token {
         int set_precedence(char c);
 
     public:
+        int m_precedence;
         Operator m_operator;
         Operand m_operand;
 
@@ -39,8 +37,11 @@ class Token {
         // Used only to create an `Operand`
         Token(int operand);
 
-        // Returns true if `Token` is `Operand`. False if it is an `Operator`.
-        bool is_operand();
+        // Returns `true` if `Token` is `Operator`. `false if it is an `Operand`.
+        bool is_operator();
+
+        // Returns `true` if self has greater precedence. If `
+        bool has_greater_precedence(Token target);
 };
 
 #endif

@@ -32,16 +32,22 @@ Token::Token() {
 
 Token::Token(char op) {
     m_is_invalid = false;
-    int precedence = set_precedence(op);
-    m_operator = {op, precedence};
+    m_precedence = set_precedence(op);
+
+    m_operator = {op}; 
 }
 
 Token::Token(int operand) { 
     m_is_invalid = false;
-    m_operand = {operand}; 
-    m_operator = Operator { '\0', -2 };
+    m_precedence = -2;
+
+    m_operand = { operand }; 
 }
 
-bool Token::is_operand() {
-    return m_operator.m_precedence == -2;
+bool Token::is_operator() {
+    return m_precedence >= 1;
+}
+
+bool Token::has_greater_precedence(Token target) {
+    return m_precedence > target.m_precedence || target.m_is_invalid;
 }

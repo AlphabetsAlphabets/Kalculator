@@ -21,6 +21,8 @@ class Lexer {
 
         bool m_iter_finished;
 
+        int result;
+
         // Strips `expr` of all spaces
         std::string strip_spaces(std::string expr);
 
@@ -36,9 +38,12 @@ class Lexer {
         // Will return immediately if iterator is already at its end.
         Token lookahead();
 
+        int perform_operation(Token lhs, Token op, Token rhs);
+
     public:
-        // Evaluates the expression
-        void eval_expr(Token token=Token(), int current=1);
+        // Evaluates the expression.
+        // `current_token` will always be an `Operand` never an `Operator`.
+        int eval_expr(Token current_token=Token());
         Lexer(std::string expr);
 };
 
