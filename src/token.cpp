@@ -39,15 +39,31 @@ Token::Token(char op) {
 
 Token::Token(int operand) { 
     m_is_invalid = false;
-    m_precedence = -2;
+    m_precedence = 0;
 
     m_operand = { operand }; 
 }
 
 bool Token::is_operator() {
-    return m_precedence >= 1;
+    return m_precedence > 0;
+}
+
+bool Token::is_invalid() {
+    return m_is_invalid;
 }
 
 bool Token::has_greater_precedence(Token target) {
     return m_precedence > target.m_precedence || target.m_is_invalid;
+}
+
+void Token::update_value(int value) {
+    m_operand.m_value = value;
+}
+
+int Token::get_value() {
+    return m_operand.m_value;
+}
+
+char Token::get_operator() {
+    return m_operator.m_op;
 }
