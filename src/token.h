@@ -27,7 +27,6 @@ class Token {
 
         bool is_binary_op(char c);
 
-        bool is_invalid();
 
     public:
         // Made for compatability. Won't actually be used for processing. 
@@ -43,6 +42,9 @@ class Token {
 
         // Returns `true` if the instance has greater precedence.
         bool has_greater_precedence(Token target);
+
+        // Returns `true` if `m_value` is `TokenType::None`
+        bool is_invalid();
 
         // Only to be used when `m_type == TokenType::Operand`
         void update_value(int value);

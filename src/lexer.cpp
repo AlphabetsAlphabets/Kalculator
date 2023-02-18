@@ -30,35 +30,48 @@ void Lexer::parse_expr(std::string expr) {
 	}
 }
 
-// Curent test: 2 + 3 * 4 + 5
-// Currently there are two main problems.
-// 1. `succeeding_operator` is never `*`.
-// 2. The iterator is advanced too quickly. Sometimes I need to peek and sometimes I need to advance. I have no idea how to create a check to determine which should come first.
+// Curent test: 1 + 2 * 3 + 4
 int Lexer::eval_expr(Token current_operand) {
     int result;
 
-    if (!current_operand.is_operator()) {
-        current_operand = lookahead();
+    // In the third recursive call `current_operand.m_type` is `TokenType::Operator`
+    // So whatever the integer equivalent of the operator will have the same operation 
+    // performed in the 2nd recursive call done to it, as well as the result of the
+    // previous recursive call.
+    //
+    // So using the test. The second recursive call is performing 2 * 3. 6 is the result.
+    // Then in the 3rd call `current_operand` will be `TokenType::Operator` so `m_value` is 43.
+    // So it is 43 * 6.
+    //
+    // Then on the next call it moves onto 4. I want it to break out the second 2 * 3 is finished.
+    // Not sure if this is the right move though since 6 + 4 is still fine. I'll need to think about
+    // it. Try 1 + 2 * 3 / 4 + 5.
+    if (current_operand.is_invalid()) {
+        current_operand = lookahead(); // 1
     }
 
-    Token current_operator = lookahead();
+    Token current_operator = lookahead(); // + 
 
     bool is_operator = current_operator.is_operator();
 
     while (is_operator && !m_iter_finished) {
-        Token next_operand = lookahead();
+        Token next_operand = lookahead(); // 2
         // This doesn't actually give the operator it gives the value instead
-        Token succeeding_operator = peek(); 
-        bool greater_precedence = succeeding_operator.has_greater_precedence(current_operator);
+        
+        Token next_operator = peek();  // *
+        bool is_invalid = next_operand.is_invalid();
+        bool greater_precedence = next_operator.has_greater_precedence(current_operator);
 
         Token inner_expr;
-        while (greater_precedence && !m_iter_finished) {
-            inner_expr = Token(eval_expr(next_operand));
-            result = perform_operation(current_operand, succeeding_operator, inner_expr);
+        while (greater_precedence && !m_iter_finished && !is_invalid) {
+            int inner_expr = eval_expr(next_operand);
+            Token new_token = Token(inner_expr);
+            result = perform_operation(next_operand, next_operator, new_token);
         }
 
         result = perform_operation(current_operand, current_operator, next_operand);
-
+        // Wondering if this has an consequences since the value is just being updated.
+        // Should probably change it to something like += instead of just assignment.
         current_operand.update_value(result);
     }
 

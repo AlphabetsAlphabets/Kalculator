@@ -82,7 +82,7 @@ char Token::get_value<char>() {
 
 template <>
 int Token::get_value<int>() {
-    return m_value - '0';
+    return m_value;
 }
 
 void Token::update_value(int value) {
