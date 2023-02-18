@@ -6,6 +6,21 @@ const int ADD = 1;
 const int SUB = 1;
 const int NUM = 0;
 
+Token::Token() {
+    m_type = TokenType::None;
+    m_precedence = 0;
+}
+
+Token::Token(char op) {
+    m_type = TokenType::Operand;
+    m_precedence = 0;
+
+    if (is_binary_op(op)) {
+        m_type = TokenType::Operator;
+        m_precedence = set_precedence(op);
+    }
+}
+
 int Token::set_precedence(char c) {
     int precedence = 0;
     switch (c) {
@@ -26,44 +41,38 @@ int Token::set_precedence(char c) {
     return precedence;
 }
 
-Token::Token() {
-    m_is_invalid = true;
-}
+bool is_binary_op(char c) {
+    bool is_operator = false;
+    switch (c) {
+        case '+':
+            is_operator = true;
+            break;
+        case '-':
+            is_operator = true;
+            break;
+        case '*':
+            is_operator = true;
+            break;
+        case '/':
+            is_operator = true;
+            break;
+    }
 
-Token::Token(char op) {
-    m_is_invalid = false;
-    m_precedence = set_precedence(op);
-
-    m_operator = {op}; 
-}
-
-Token::Token(int operand) { 
-    m_is_invalid = false;
-    m_precedence = 0;
-
-    m_operand = { operand }; 
-}
-
-bool Token::is_operator() {
-    return m_precedence > 0;
+    return is_operator;
 }
 
 bool Token::is_invalid() {
-    return m_is_invalid;
+    return m_type == TokenType::None;
 }
 
-bool Token::has_greater_precedence(Token target) {
-    return m_precedence > target.m_precedence || target.m_is_invalid;
+bool Token::is_operator() {
+    return m_type == TokenType::Operator && !is_invalid();
 }
 
-void Token::update_value(int value) {
-    m_operand.m_value = value;
-}
-
-int Token::get_value() {
-    return m_operand.m_value;
-}
-
-char Token::get_operator() {
-    return m_operator.m_op;
+std::variant<int, char> Token::get_value() {
+    if (is_operator()) {
+        return m_value;
+    } else {
+        return m_value - '0';
+    }
 }
