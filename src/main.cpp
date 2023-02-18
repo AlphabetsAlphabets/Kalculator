@@ -5,7 +5,7 @@
 #include "lexer.h"
 
 int main() {
-    std::string expr = "2 + 3 * 4 + 5";
+    std::string expr = "1 + 2 * 3 + 4"; // 11
     auto lexer = Lexer(expr);
     int result = lexer.eval_expr();
     std::cout << expr << " = " << result << std::endl;

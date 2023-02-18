@@ -1,8 +1,6 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include <variant>
-
 enum TokenType {
     None,
     Operator,
@@ -43,13 +41,15 @@ class Token {
         // Returns `true` if `Token` is `TokenType::Operator`. `false` if it is an `TokenType::Operand`.
         bool is_operator();
 
-        // Returns `true` if self has greater precedence. If `
+        // Returns `true` if the instance has greater precedence.
         bool has_greater_precedence(Token target);
 
+        // Only to be used when `m_type == TokenType::Operand`
         void update_value(int value);
 
         // Will return `int` or `char` based on `TokenType`.
-        std::variant<int, char> get_value();
+        template <typename T>
+        T get_value();
 };
 
 #endif

@@ -14,10 +14,12 @@ Token::Token() {
 Token::Token(char op) {
     m_type = TokenType::Operand;
     m_precedence = 0;
+    m_value = op - '0';
 
     if (is_binary_op(op)) {
         m_type = TokenType::Operator;
         m_precedence = set_precedence(op);
+        m_value = op;
     }
 }
 
@@ -41,7 +43,7 @@ int Token::set_precedence(char c) {
     return precedence;
 }
 
-bool is_binary_op(char c) {
+bool Token::is_binary_op(char c) {
     bool is_operator = false;
     switch (c) {
         case '+':
@@ -69,10 +71,20 @@ bool Token::is_operator() {
     return m_type == TokenType::Operator && !is_invalid();
 }
 
-std::variant<int, char> Token::get_value() {
-    if (is_operator()) {
-        return m_value;
-    } else {
-        return m_value - '0';
-    }
+bool Token::has_greater_precedence(Token target) {
+    return m_precedence > target.m_precedence;
+}
+
+template <>
+char Token::get_value<char>() {
+    return m_value;
+}
+
+template <>
+int Token::get_value<int>() {
+    return m_value - '0';
+}
+
+void Token::update_value(int value) {
+    m_value = value;
 }
