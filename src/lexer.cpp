@@ -29,17 +29,17 @@ void Lexer::parse_expr(std::string expr) {
 // Curent test: 3 / 3 + 1 * 9 * 9 + 500 = 582
 int Lexer::eval_expr(Token current_operand) {
     if (current_operand.is_invalid()) {
-        current_operand = lookahead(); // 1
+        current_operand = lookahead();
     }
 
-    Token current_operator = lookahead(); // + 
+    Token current_operator = lookahead();
 
     bool is_operator = current_operator.is_operator();
 
     int result;
     while (is_operator && !m_iter_finished) {
         Token next_operand = lookahead(); 
-        Token next_operator = peek();  // *
+        Token next_operator = peek(); 
         bool is_invalid = next_operand.is_invalid() && next_operator.is_invalid();
         bool greater_precedence = next_operator.has_greater_precedence(current_operator);
 
