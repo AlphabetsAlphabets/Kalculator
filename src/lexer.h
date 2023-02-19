@@ -25,9 +25,6 @@ class Lexer {
         // Strips `expr` of all spaces
         std::string strip_spaces(std::string expr);
 
-        // Creates and returns `Token` from `c`.
-        Token create_token(char c);
-
         // Creates tokens and populates `m_tokens`
         void parse_expr(std::string expr);
 

@@ -14,7 +14,11 @@ Token::Token() {
 Token::Token(char op) {
     m_type = TokenType::Operand;
     m_precedence = 0;
-    m_value = op - '0';
+    if (std::isdigit(op) == 0) {
+        m_value = op;
+    } else {
+        m_value = op - '0';
+    }
 
     if (is_binary_op(op)) {
         m_type = TokenType::Operator;

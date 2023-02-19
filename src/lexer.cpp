@@ -18,34 +18,16 @@ std::string Lexer::strip_spaces(std::string expr) {
 	return stripped;
 }
 
-Token Lexer::create_token(char c) {
-	return Token(c);
-}
-
 void Lexer::parse_expr(std::string expr) {
 	std::string stripped = strip_spaces(expr);
 	for (char c : stripped) {
-		auto token = create_token(c);
+		auto token = Token(c);
 		m_tokens.push_back(token);
 	}
 }
 
-// Curent test: 1 + 2 * 3 + 4
+// Curent test: 3 / 3 + 1 * 9 * 9 + 500 = 582
 int Lexer::eval_expr(Token current_operand) {
-    int result;
-
-    // In the third recursive call `current_operand.m_type` is `TokenType::Operator`
-    // So whatever the integer equivalent of the operator will have the same operation 
-    // performed in the 2nd recursive call done to it, as well as the result of the
-    // previous recursive call.
-    //
-    // So using the test. The second recursive call is performing 2 * 3. 6 is the result.
-    // Then in the 3rd call `current_operand` will be `TokenType::Operator` so `m_value` is 43.
-    // So it is 43 * 6.
-    //
-    // Then on the next call it moves onto 4. I want it to break out the second 2 * 3 is finished.
-    // Not sure if this is the right move though since 6 + 4 is still fine. I'll need to think about
-    // it. Try 1 + 2 * 3 / 4 + 5.
     if (current_operand.is_invalid()) {
         current_operand = lookahead(); // 1
     }
@@ -54,25 +36,26 @@ int Lexer::eval_expr(Token current_operand) {
 
     bool is_operator = current_operator.is_operator();
 
+    int result;
     while (is_operator && !m_iter_finished) {
-        Token next_operand = lookahead(); // 2
-        // This doesn't actually give the operator it gives the value instead
-        
+        Token next_operand = lookahead(); 
         Token next_operator = peek();  // *
-        bool is_invalid = next_operand.is_invalid();
+        bool is_invalid = next_operand.is_invalid() && next_operator.is_invalid();
         bool greater_precedence = next_operator.has_greater_precedence(current_operator);
 
         Token inner_expr;
         while (greater_precedence && !m_iter_finished && !is_invalid) {
             int inner_expr = eval_expr(next_operand);
             Token new_token = Token(inner_expr);
-            result = perform_operation(next_operand, next_operator, new_token);
-        }
+            result = perform_operation(current_operand, current_operator, new_token);
+            current_operand.update_value(result);
+        } 
 
-        result = perform_operation(current_operand, current_operator, next_operand);
-        // Wondering if this has an consequences since the value is just being updated.
-        // Should probably change it to something like += instead of just assignment.
-        current_operand.update_value(result);
+        if (!is_invalid && !greater_precedence) {
+            result = perform_operation(current_operand, current_operator, next_operand);
+            current_operand.update_value(result);
+            current_operator = lookahead();
+        }
     }
 
     return current_operand.get_value<int>();
