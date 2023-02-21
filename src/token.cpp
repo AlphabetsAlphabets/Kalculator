@@ -11,10 +11,6 @@ Token::Token() {
     m_precedence = 0;
 }
 
-// Currently this only works for digits 0 to 9.
-// 10 is interpreted as 1 and 0.
-// 11 is interpreted as 1 and 1.
-// They are interpreted individually instead of as a whole.
 Token::Token(char op) {
     m_type = TokenType::Operand;
     m_precedence = 0;

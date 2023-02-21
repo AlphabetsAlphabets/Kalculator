@@ -18,6 +18,7 @@ std::string Lexer::strip_spaces(std::string expr) {
 	return stripped;
 }
 
+// TODO: Make this work on decimals and multi digit numbers
 void Lexer::parse_expr(std::string expr) {
 	std::string stripped = strip_spaces(expr);
 	for (char c : stripped) {
