@@ -18,6 +18,7 @@ Token::Token(std::string value) {
         m_value = std::stod(value);
     } catch (const std::invalid_argument) {
         char op = value[0];
+        m_type = TokenType::Operator;
         m_value = (double) op;
         m_precedence = set_precedence(op);
     }
@@ -86,6 +87,6 @@ double Token::get_value<double>() {
     return m_value;
 }
 
-void Token::update_value(int value) {
+void Token::update_value(double value) {
     m_value = value;
 }

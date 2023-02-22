@@ -26,7 +26,6 @@ class Token {
         
         TokenType m_type;
 
-        char m_op;
         double m_value;
 
         // Only to be used by non-numeric characters.
@@ -53,7 +52,7 @@ class Token {
         bool is_invalid();
 
         // Only to be used when `m_type == TokenType::Operand`
-        void update_value(int value);
+        void update_value(double value);
 
         // Will return `int` or `char` based on `TokenType`.
         template <typename T>

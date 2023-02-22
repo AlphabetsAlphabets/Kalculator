@@ -11,8 +11,8 @@ void print_tokens(std::vector<std::string> tokens) {
 }
 
 int main() {
-    std::string expr = "1 + 2 * 3";
+    std::string expr = "1.1 + 0.5";
     auto lexer = Lexer(expr);
-    int result = lexer.eval_expr();
+    double result = lexer.eval_expr();
     std::cout << expr << " = " << result << std::endl;
 }

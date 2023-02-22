@@ -46,7 +46,7 @@ double Lexer::eval_expr(Token current_operand) {
 
     bool is_operator = current_operator.is_operator();
 
-    int result;
+    double result;
     while (is_operator && !m_iter_finished) {
         Token next_operand = lookahead(); 
         Token next_operator = peek(); 
