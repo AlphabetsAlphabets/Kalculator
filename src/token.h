@@ -2,6 +2,10 @@
 #define TOKEN_H
 
 #include <cctype>
+#include <string>
+#include <stdlib.h>
+#include <cmath>
+#include <stdexcept>
 
 enum TokenType {
     None,
@@ -22,13 +26,13 @@ class Token {
         
         TokenType m_type;
 
-        int m_value;
+        char m_op;
+        double m_value;
 
         // Only to be used by non-numeric characters.
         int set_precedence(char c);
 
         bool is_binary_op(char c);
-
 
     public:
         // Made for compatability. Won't actually be used for processing. 
@@ -37,7 +41,7 @@ class Token {
         Token();
 
         // Creates a token.
-        Token(char op);
+        Token(std::string num);
 
         // Returns `true` if `Token` is `TokenType::Operator`. `false` if it is an `TokenType::Operand`.
         bool is_operator();

@@ -20,15 +20,24 @@ std::string Lexer::strip_spaces(std::string expr) {
 
 // TODO: Make this work on decimals and multi digit numbers
 void Lexer::parse_expr(std::string expr) {
-	std::string stripped = strip_spaces(expr);
-	for (char c : stripped) {
-		auto token = Token(c);
-		m_tokens.push_back(token);
-	}
+    int index = 0;
+    int start = 0;
+    while (index != std::string::npos) {
+        index = expr.find(' ', start);
+        std::string part = expr.substr(start, index - start);
+        start = index;
+
+        if (index != std::string::npos) {
+            start++;
+        }
+
+        auto token = Token(part);
+        m_tokens.push_back(token);
+    }
 }
 
 // Curent test: 3 / 3 + 1 * 9 * 9 + 500 = 582
-int Lexer::eval_expr(Token current_operand) {
+double Lexer::eval_expr(Token current_operand) {
     if (current_operand.is_invalid()) {
         current_operand = lookahead();
     }
@@ -46,7 +55,7 @@ int Lexer::eval_expr(Token current_operand) {
 
         Token inner_expr;
         while (greater_precedence && !m_iter_finished && !is_invalid) {
-            int inner_expr = eval_expr(next_operand);
+            std::string inner_expr = std::to_string(eval_expr(next_operand));
             Token new_token = Token(inner_expr);
             result = perform_operation(current_operand, current_operator, new_token);
             current_operand.update_value(result);
@@ -59,7 +68,7 @@ int Lexer::eval_expr(Token current_operand) {
         }
     }
 
-    return current_operand.get_value<int>();
+    return current_operand.get_value<double>();
 }
 
 bool Lexer::has_iter_finished() {
@@ -67,10 +76,10 @@ bool Lexer::has_iter_finished() {
     return m_iter_finished;
 }
 
-int Lexer::perform_operation(Token lhs, Token op, Token rhs) {
-    int v1 = lhs.get_value<int>();
-    int v2 = rhs.get_value<int>();
-    int res;
+double Lexer::perform_operation(Token lhs, Token op, Token rhs) {
+    double v1 = lhs.get_value<double>();
+    double v2 = rhs.get_value<double>();
+    double res;
 
     switch (op.get_value<char>()) {
         case '+':

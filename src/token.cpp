@@ -11,19 +11,15 @@ Token::Token() {
     m_precedence = 0;
 }
 
-Token::Token(char op) {
+Token::Token(std::string value) {
     m_type = TokenType::Operand;
     m_precedence = 0;
-    if (std::isdigit(op) == 0) {
-        m_value = op;
-    } else {
-        m_value = op - '0';
-    }
-
-    if (is_binary_op(op)) {
-        m_type = TokenType::Operator;
+    try {
+        m_value = std::stod(value);
+    } catch (const std::invalid_argument) {
+        char op = value[0];
+        m_value = (double) op;
         m_precedence = set_precedence(op);
-        m_value = op;
     }
 }
 
@@ -79,13 +75,14 @@ bool Token::has_greater_precedence(Token target) {
     return m_precedence > target.m_precedence;
 }
 
+// TODO: Will need to test these two functions
 template <>
 char Token::get_value<char>() {
-    return m_value;
+    return (char) m_value;
 }
 
 template <>
-int Token::get_value<int>() {
+double Token::get_value<double>() {
     return m_value;
 }
 

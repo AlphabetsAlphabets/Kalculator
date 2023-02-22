@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
+#include <algorithm>
 
 #include "token.h"
 
@@ -37,12 +38,11 @@ class Lexer {
         // Returns the next token without advancing the iterator.
         Token peek();
 
-        int perform_operation(Token lhs, Token op, Token rhs);
+        double perform_operation(Token lhs, Token op, Token rhs);
 
     public:
         // Evaluates the expression.
-        // `current_token` will always be an `Operand` never an `Operator`.
-        int eval_expr(Token current_operand=Token());
+        double eval_expr(Token current_operand=Token());
         Lexer(std::string expr);
 };
 
