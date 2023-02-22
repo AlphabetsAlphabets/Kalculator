@@ -13,3 +13,4 @@ Without it, the calculator will just break.
 The reason is because tokens are separated via whitespace. A better way would be to go through the whole thing character by character and peeking ahead like you're supposed to.
 
 2. Parenthesis are not supported. Not yet anyways.
+3. Negatives. Such as `- 1 + 2`. The calculator will assume `-` as an `Operand`. This is due to the way things are set.
