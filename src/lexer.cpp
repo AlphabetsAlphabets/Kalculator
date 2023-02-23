@@ -18,25 +18,55 @@ std::string Lexer::strip_spaces(std::string expr) {
 	return stripped;
 }
 
-// TODO: Make this work on decimals and multi digit numbers
-void Lexer::parse_expr(std::string expr) {
-    int index = 0;
-    int start = 0;
-    while (index != std::string::npos) {
-        index = expr.find(' ', start);
-        std::string part = expr.substr(start, index - start);
-        start = index;
-
-        if (index != std::string::npos) {
-            start++;
-        }
-
-        auto token = Token(part);
-        m_tokens.push_back(token);
+bool Lexer::is_binary_op(char op) {
+    bool is_operator = false;
+    switch (op) {
+        case '+':
+            is_operator = true;
+            break;
+        case '-':
+            is_operator = true;
+            break;
+        case '*':
+            is_operator = true;
+            break;
+        case '/':
+            is_operator = true;
+        case '^': 
+            is_operator = true;
+            break;
     }
+
+    return is_operator;
 }
 
-// Curent test: 3 / 3 + 1 * 9 * 9 + 500 = 582
+void Lexer::parse_expr(std::string expr) {
+    std::string stripped = strip_spaces(expr);
+    std::string num;
+    for (char c : stripped) {
+        if (std::isdigit(c)) {
+            num += c;
+        } else if (c == '.') {
+            num += c;
+        } else if (is_binary_op(c)) {
+            
+            Token value = Token(num);
+            Token op = Token(c);
+            
+            // The order the tokens are being pushed into the vector matters.
+            // That's because in `eval_expr` the expected order is that the
+            // odd elements in the vector are `Operand`s and the even are `Operator`s.
+            
+            m_tokens.push_back(value);
+            m_tokens.push_back(op);
+            num.clear();
+        }  
+    }
+
+    // The number in the expr
+    m_tokens.push_back(Token(num));
+}
+
 double Lexer::eval_expr(Token current_operand) {
     if (current_operand.is_invalid()) {
         current_operand = lookahead();
@@ -93,6 +123,8 @@ double Lexer::perform_operation(Token lhs, Token op, Token rhs) {
             break;
         case '/':
             res =  v1 / v2;
+        case '^':
+            res = std::pow(v1, v2);
             break;
     }
 
@@ -106,7 +138,6 @@ Token Lexer::lookahead() {
 }
 
 Token Lexer::peek() {
-    // NOTE: I don't think a check is needed. This is most definitely not true.
     Token next = *m_iter++;
     --m_iter;
     return next;

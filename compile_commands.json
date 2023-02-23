@@ -6,7 +6,7 @@
 },
 {
   "directory": "/home/yjh/Documents/Kalculator/build",
-  "command": "/usr/bin/c++  -I/home/yjh/Documents/Kalculator/src  -g -std=gnu++20 -o CMakeFiles/calc.dir/src/token.cpp.o -c /home/yjh/Documents/Kalculator/src/token.cpp",
+  "command": "/usr/bin/c++  -I/home/yjh/Documents/Kalculator/src  -
   "file": "/home/yjh/Documents/Kalculator/src/token.cpp"
 },
 {

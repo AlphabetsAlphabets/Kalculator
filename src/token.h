@@ -1,9 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include <cctype>
 #include <string>
-#include <stdlib.h>
 #include <cmath>
 #include <stdexcept>
 
@@ -31,16 +29,17 @@ class Token {
         // Only to be used by non-numeric characters.
         int set_precedence(char c);
 
-        bool is_binary_op(char c);
-
     public:
         // Made for compatability. Won't actually be used for processing. 
         // Only used to initialize an empty token that is to be reseated.
         // Or for any other similar process.
         Token();
 
-        // Creates a token.
+        // Creates a token from a string.
         Token(std::string num);
+
+        // Creats a token from a char. Used only by `Operator`.
+        Token(char op);
 
         // Returns `true` if `Token` is `TokenType::Operator`. `false` if it is an `TokenType::Operand`.
         bool is_operator();

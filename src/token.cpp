@@ -1,5 +1,6 @@
 #include "token.h"
 
+const int EXPO = 3;
 const int MULTI = 2;
 const int DIVIDE = 2;
 const int ADD = 1;
@@ -24,6 +25,13 @@ Token::Token(std::string value) {
     }
 }
 
+
+Token::Token(char op) {
+    m_type = TokenType::Operator;
+    m_value = (double) op;
+    m_precedence = set_precedence(op);
+}
+
 int Token::set_precedence(char c) {
     int precedence = 0;
     switch (c) {
@@ -38,31 +46,14 @@ int Token::set_precedence(char c) {
             break;
         case '/':
             precedence = DIVIDE;
+        case '^':
+            precedence = EXPO;
             break;
     }
 
     return precedence;
 }
 
-bool Token::is_binary_op(char c) {
-    bool is_operator = false;
-    switch (c) {
-        case '+':
-            is_operator = true;
-            break;
-        case '-':
-            is_operator = true;
-            break;
-        case '*':
-            is_operator = true;
-            break;
-        case '/':
-            is_operator = true;
-            break;
-    }
-
-    return is_operator;
-}
 
 bool Token::is_invalid() {
     return m_type == TokenType::None;

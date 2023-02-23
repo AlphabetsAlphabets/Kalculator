@@ -4,14 +4,8 @@
 
 #include "lexer.h"
 
-void print_tokens(std::vector<std::string> tokens) {
-    for (auto token: tokens) {
-        std::cout << "'" << token << "'" << std::endl;
-    }
-}
-
 int main() {
-    std::string expr = "1.1 + 0.5";
+    std::string expr = "1+2.2^3 - 20";
     auto lexer = Lexer(expr);
     double result = lexer.eval_expr();
     std::cout << expr << " = " << result << std::endl;

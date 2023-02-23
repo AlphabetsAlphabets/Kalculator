@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
-#include <algorithm>
+#include <cmath>
 
 #include "token.h"
 
@@ -39,6 +39,8 @@ class Lexer {
         Token peek();
 
         double perform_operation(Token lhs, Token op, Token rhs);
+
+        bool is_binary_op(char op);
 
     public:
         // Evaluates the expression.
