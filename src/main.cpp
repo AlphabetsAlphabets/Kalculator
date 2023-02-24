@@ -1,11 +1,11 @@
 #include <string>
-#include <iostream>
 #include <vector>
+#include <iostream>
 
 #include "lexer.h"
 
 int main() {
-    std::string expr = "2 * (2 + 3)^4";
+    std::string expr = "2 * (2 + 5)^3";
     auto lexer = Lexer(expr);
     double result = lexer.eval_expr();
     std::cout << expr << " = " << result << std::endl;

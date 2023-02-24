@@ -70,6 +70,8 @@ void Lexer::parse_expr(std::string expr) {
             m_tokens.push_back(op);
         }  
     }
+
+    m_tokens.push_back(num);
 }
 
 double Lexer::eval_expr(Token current_operand) {
@@ -92,13 +94,13 @@ double Lexer::eval_expr(Token current_operand) {
 
         // Found the starting paren, entering it.
         if (next_operand.get_value<char>() == '(') {
-            next_operand = eval_expr(lookahead());
+            double new_value = eval_expr(lookahead());
+            next_operand = Token(new_value);
         }
 
         Token next_operator = peek(); 
 
         bool is_invalid = next_operand.is_invalid() && next_operator.is_invalid();
-
         bool greater_precedence = next_operator.has_greater_precedence(current_operator);
 
         // Found the ending paren, skipping it.
@@ -114,9 +116,7 @@ double Lexer::eval_expr(Token current_operand) {
             current_operand.update_value(result);
         } 
 
-        // This is completely skipped if expr is (x + y)^z because
-        // is_invalud is true
-        if (!is_invalid){
+        if (!is_invalid) {
             result = perform_operation(current_operand, current_operator, next_operand);
             current_operand.update_value(result);
             current_operator = lookahead();

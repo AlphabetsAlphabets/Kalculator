@@ -38,8 +38,11 @@ class Token {
         // Creates a token from a string.
         Token(std::string num);
 
-        // Creats a token from a char. Used only by `Operator`.
+        // Creats a token from a `char`. Used only by `Operator`.
         Token(char op);
+        
+        // Creats a token from a `double`. Used only by `Operand`.
+        Token(double num);
 
         // Returns `true` if `Token` is `TokenType::Operator`. `false` if it is an `TokenType::Operand`.
         bool is_operator();

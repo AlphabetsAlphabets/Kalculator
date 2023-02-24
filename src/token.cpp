@@ -26,11 +26,16 @@ Token::Token(std::string value) {
     }
 }
 
-
 Token::Token(char op) {
     m_type = TokenType::Operator;
     m_value = (double) op;
     m_precedence = set_precedence(op);
+}
+
+Token::Token(double num) {
+    m_type = TokenType::Operator;
+    m_value = num;
+    m_precedence = 0;
 }
 
 int Token::set_precedence(char c) {
