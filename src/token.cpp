@@ -1,5 +1,6 @@
 #include "token.h"
 
+const int PAREN = 4;
 const int EXPO = 3;
 const int MULTI = 2;
 const int DIVIDE = 2;
@@ -48,6 +49,12 @@ int Token::set_precedence(char c) {
             precedence = DIVIDE;
         case '^':
             precedence = EXPO;
+            break;
+        case ')':
+            precedence = PAREN;
+            break;
+        case '(':
+            precedence = PAREN;
             break;
     }
 

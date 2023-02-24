@@ -47,7 +47,7 @@ class Token {
         // Returns `true` if the instance has greater precedence.
         bool has_greater_precedence(Token target);
 
-        // Returns `true` if `m_value` is `TokenType::None`
+        // Returns `true` if `m_type` is `TokenType::None`
         bool is_invalid();
 
         // Only to be used when `m_type == TokenType::Operand`

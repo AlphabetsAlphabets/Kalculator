@@ -35,6 +35,12 @@ bool Lexer::is_binary_op(char op) {
         case '^': 
             is_operator = true;
             break;
+        case '(':
+            is_operator = true;
+            break;
+        case ')':
+            is_operator = true;
+            break;
     }
 
     return is_operator;
@@ -49,22 +55,21 @@ void Lexer::parse_expr(std::string expr) {
         } else if (c == '.') {
             num += c;
         } else if (is_binary_op(c)) {
-            
-            Token value = Token(num);
             Token op = Token(c);
             
             // The order the tokens are being pushed into the vector matters.
             // That's because in `eval_expr` the expected order is that the
             // odd elements in the vector are `Operand`s and the even are `Operator`s.
             
-            m_tokens.push_back(value);
+            if (!num.empty()) {
+                Token value = Token(num);
+                m_tokens.push_back(value);
+                num.clear();
+            }
+
             m_tokens.push_back(op);
-            num.clear();
         }  
     }
-
-    // The number in the expr
-    m_tokens.push_back(Token(num));
 }
 
 double Lexer::eval_expr(Token current_operand) {
@@ -78,10 +83,28 @@ double Lexer::eval_expr(Token current_operand) {
 
     double result;
     while (is_operator && !m_iter_finished) {
+        bool is_open_paren = current_operator.get_value<char>() == ')';
+        if (is_open_paren) {
+            current_operator = lookahead();
+        }
+
         Token next_operand = lookahead(); 
+
+        // Found the starting paren, entering it.
+        if (next_operand.get_value<char>() == '(') {
+            next_operand = eval_expr(lookahead());
+        }
+
         Token next_operator = peek(); 
+
         bool is_invalid = next_operand.is_invalid() && next_operator.is_invalid();
+
         bool greater_precedence = next_operator.has_greater_precedence(current_operator);
+
+        // Found the ending paren, skipping it.
+        if (next_operator.get_value<char>() == ')') {
+            greater_precedence = false;
+        }
 
         Token inner_expr;
         while (greater_precedence && !m_iter_finished && !is_invalid) {
@@ -91,11 +114,14 @@ double Lexer::eval_expr(Token current_operand) {
             current_operand.update_value(result);
         } 
 
-        if (!is_invalid && !greater_precedence) {
+        // This is completely skipped if expr is (x + y)^z because
+        // is_invalud is true
+        if (!is_invalid){
             result = perform_operation(current_operand, current_operator, next_operand);
             current_operand.update_value(result);
             current_operator = lookahead();
         }
+
     }
 
     return current_operand.get_value<double>();
